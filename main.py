@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 from data_collectors.twitter_reader_nitter import capturar_tweets
-from data_collectors.cvm_reader import capturar_cvm
+from data_collectors.cvm_oficial_reader import capturar_fatos_cvm
 from data_collectors.infomoney_reader import capturar_infomoney
 from data_collectors.bloomberg_reader import capturar_bloomberg
 from data_collectors.cvm_oficial_reader import capturar_fatos_relevantes
