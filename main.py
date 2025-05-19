@@ -8,7 +8,7 @@ from data_collectors.volume_tracker import executar_monitoramento_volumes
 from intelligence.opcoes_estrategicas import executar_analise_opcoes
 from intelligence.text_analyzer import analisar_texto
 from intelligence.decision_maker import gerar_alerta
-from intelligence.strategy_engine import gerar_recomendacoes
+from intelligence.strategy_engine import gerar_estrategia_recomendada as gerar_recomendacoes
 from intelligence.backtest_engine import registrar_resultados
 from intelligence.event_tracker import rastrear_eventos  # CORRETO AQUI
 
