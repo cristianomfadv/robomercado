@@ -13,7 +13,6 @@ from intelligence.backtest_engine import avaliar_resultados
 from intelligence.event_tracker import rastrear_eventos  # CORRETO AQUI
 
 from dashboard.exibir_console import exibir_alertas
-from dashboard.painel_execucao import atualizar_painel
 from dashboard.custos_monitor import registrar_execucao
 
 import json
