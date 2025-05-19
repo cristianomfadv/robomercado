@@ -9,7 +9,7 @@ from intelligence.opcoes_estrategicas import executar_analise_opcoes
 from intelligence.text_analyzer import analisar_texto
 from intelligence.decision_maker import gerar_alerta
 from intelligence.strategy_engine import gerar_estrategia_recomendada as gerar_recomendacoes
-from intelligence.backtest_engine import registrar_resultados
+from intelligence.backtest_engine import avaliar_resultados
 from intelligence.event_tracker import rastrear_eventos  # CORRETO AQUI
 
 from dashboard.exibir_console import exibir_alertas
@@ -80,7 +80,7 @@ def fluxo_principal():
     analises.extend(recomendacoes)
 
     # Backtest e registro
-    registrar_resultados(recomendacoes)
+    avaliar_resultados(recomendacoes)
 
     # Execução de rotina de opções (11h e 15h)
     executar_analise_opcoes()
