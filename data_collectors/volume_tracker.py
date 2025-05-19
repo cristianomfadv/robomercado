@@ -1,19 +1,28 @@
 # data_collectors/volume_tracker.py
 
-from datetime import datetime
-import random
+import yfinance as yf
+import pandas as pd
 
-def detectar_anomalias_volume():
-    # Simulação de ativos monitorados
-    ativos = ["PETR4", "VALE3", "BBAS3", "KLBN11", "IRBR3"]
-    alertas_volume = []
+def executar_monitoramento_volumes():
+    ativos = ["VALE3.SA", "PETR4.SA", "BBAS3.SA", "BOVA11.SA", "BBDC4.SA"]
+    alertas = []
 
     for ativo in ativos:
-        volume_hoje = random.randint(50000000, 300000000)
-        media_volume = random.randint(40000000, 100000000)
+        try:
+            dados = yf.download(ativo, period="5d", interval="1d", progress=False)
+            if dados is not None and not dados.empty:
+                volumes = dados["Volume"].tail(5)
+                media = volumes[:-1].mean()
+                ultimo = volumes[-1]
 
-        if volume_hoje > media_volume * 2:
-            alerta = f"📊 {ativo}: Volume de negociação {volume_hoje:,} superou o dobro da média ({media_volume:,}) – possível entrada institucional [{datetime.now().strftime('%d/%m %H:%M')}]"
-            alertas_volume.append(alerta)
+                if ultimo > media * 1.5:
+                    alerta = {
+                        "ativo": ativo.replace(".SA", ""),
+                        "tipo": "🔍 Alerta de volume",
+                        "detalhe": f"Volume de hoje ({ultimo}) muito acima da média ({int(media)})."
+                    }
+                    alertas.append(alerta)
+        except Exception as e:
+            print(f"Erro ao processar {ativo}: {e}")
 
-    return alertas_volume
+    return alertas
