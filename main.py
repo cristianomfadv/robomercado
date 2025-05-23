@@ -1,10 +1,10 @@
 import schedule
 import time
-from utils.email_alerta import enviar_email_alerta
-from data_collectors.twitter_reader_nitter import buscar_tweets_relevantes
-from data_collectors.infomoney_reader import coletar_noticias_infomoney
-from data_collectors.bloomberg_reader import coletar_noticias_bloomberg
-from data_collectors.cvm_oficial_reader import buscar_eventos_cvm
+from utils.email_alerta import enviar_alerta_email
+from data_collectors.twitter_reader_nitter import capturar_tweets
+from data_collectors.infomoney_reader import capturar_noticias_infomoney
+from data_collectors.bloomberg_reader import capturar_noticias_bloomberg
+from data_collectors.cvm_oficial_reader import capturar_fatos_cvm
 from data_collectors.volume_tracker import executar_monitoramento_volumes
 from intelligence.text_analyzer import analisar_textos
 from intelligence.opcoes_estrategicas import executar_analise_opcoes
@@ -24,7 +24,7 @@ def fluxo_principal():
     noticias_infomoney = coletar_noticias_infomoney()
     noticias_bloomberg = coletar_noticias_bloomberg()
     eventos_cvm = buscar_eventos_cvm()
-    tweets = buscar_tweets_relevantes()
+    tweets = capturar_tweets()
 
     # 2. Volume incomum B3
     volumes = executar_monitoramento_volumes()
