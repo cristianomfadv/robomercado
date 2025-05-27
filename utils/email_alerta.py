@@ -1,28 +1,40 @@
-# utils/email_alerta.py
-
 import smtplib
-from email.message import EmailMessage
-import os
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
-EMAIL_ORIGEM = os.getenv("EMAIL_ORIGEM")
-EMAIL_SENHA = os.getenv("EMAIL_SENHA")
-EMAIL_DESTINO = os.getenv("EMAIL_DESTINO")
+def enviar_email_alerta(alertas, destino=None):
+    remetente = os.getenv("EMAIL_ORIGEM")
+    senha = os.getenv("EMAIL_SENHA")
+    destino = destino or os.getenv("EMAIL_DESTINO")
 
-def enviar_alerta_email(assunto, mensagem):
+    if not remetente or not senha or not destino:
+        print("⚠️ Variáveis de e-mail não configuradas corretamente.")
+        return
+
+    if not alertas:
+        print("📭 Nenhum alerta relevante para enviar por e-mail.")
+        return
+
     try:
-        msg = EmailMessage()
-        msg["Subject"] = assunto
-        msg["From"] = EMAIL_ORIGEM
-        msg["To"] = EMAIL_DESTINO
-        msg.set_content(mensagem)
+        assunto = "📈 Alerta Estratégico - RobôMercado"
+        corpo = "🚨 ALERTAS DETECTADOS PELO ROBÔ:\n\n"
+        corpo += "\n\n".join(alertas)
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-            smtp.login(EMAIL_ORIGEM, EMAIL_SENHA)
-            smtp.send_message(msg)
+        msg = MIMEMultipart()
+        msg['From'] = remetente
+        msg['To'] = destino
+        msg['Subject'] = assunto
+        msg.attach(MIMEText(corpo, 'plain'))
 
-        print("📧 Alerta enviado com sucesso para seu e-mail.")
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as servidor:
+            servidor.login(remetente, senha)
+            servidor.sendmail(remetente, destino, msg.as_string())
+
+        print(f"📧 Alerta enviado para {destino}: {len(alertas)} item(ns)")
+
     except Exception as e:
-        print(f"❌ Falha ao enviar e-mail: {e}")
+        print(f"❌ Erro ao enviar e-mail: {e}")
