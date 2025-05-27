@@ -1,40 +1,44 @@
 # intelligence/event_tracker.py
 
+import json
+import os
 from datetime import datetime, timedelta
 
-# Simulação de eventos futuros por ativo
-eventos_agendados = [
-    {"ativo": "BBAS3", "evento": "divulgação de resultados", "data": "2025-05-22"},
-    {"ativo": "IRBR3", "evento": "vencimento de opções", "data": "2025-05-20"},
-    {"ativo": "KLBN11", "evento": "reunião de conselho", "data": "2025-05-21"},
-    {"ativo": "PETR4", "evento": "pagamento de dividendos", "data": "2025-05-27"},
-]
+ARQUIVO_EVENTOS = "eventos_agendados.json"
 
-def analisar_impacto_evento(ativo, evento):
-    evento = evento.lower()
+def carregar_eventos_agendados():
+    if not os.path.exists(ARQUIVO_EVENTOS):
+        return []
+    with open(ARQUIVO_EVENTOS, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    if "resultados" in evento:
-        return f"📊 {ativo}: Balanço previsto. Histórico sugere alta após divulgação. Sinal de oportunidade para CALL ou trava de alta."
-    elif "opções" in evento:
-        return f"🟡 {ativo}: Vencimento de opções próximo. Potencial aumento de volatilidade. Avaliar hedge ou encerramento antecipado."
-    elif "conselho" in evento:
-        return f"🔍 {ativo}: Reunião de conselho marcada. Pode haver anúncios estratégicos. Monitorar movimentações incomuns."
-    elif "dividendos" in evento:
-        return f"🟢 {ativo}: Data de pagamento de dividendos. Tendência histórica de valorização pré-data. Sugerida venda coberta de PUT."
-    else:
-        return f"ℹ️ {ativo}: Evento agendado – {evento}"
+def salvar_eventos_agendados(eventos):
+    with open(ARQUIVO_EVENTOS, "w", encoding="utf-8") as f:
+        json.dump(eventos, f, ensure_ascii=False, indent=2)
 
-def rastrear_eventos():
+def registrar_evento(ativo, data, descricao):
+    eventos = carregar_eventos_agendados()
+    eventos.append({
+        "ativo": ativo,
+        "data": data,
+        "descricao": descricao
+    })
+    salvar_eventos_agendados(eventos)
+
+def verificar_eventos_agendados():
+    eventos = carregar_eventos_agendados()
     hoje = datetime.now().date()
-    alertas_eventos = []
+    cinco_dias = hoje + timedelta(days=5)
+    dois_dias = hoje + timedelta(days=2)
 
-    for evento in eventos_agendados:
+    alertas = []
+
+    for evento in eventos:
         data_evento = datetime.strptime(evento["data"], "%Y-%m-%d").date()
-        dias_para_evento = (data_evento - hoje).days
 
-        if dias_para_evento in [5, 2]:
-            interpretacao = analisar_impacto_evento(evento["ativo"], evento["evento"])
-            alerta = f"📅 Evento em {evento['data']} ({dias_para_evento} dias úteis): {interpretacao}"
-            alertas_eventos.append(alerta)
+        if data_evento == cinco_dias:
+            alertas.append(f"[5 DIAS] {evento['ativo']} - {evento['descricao']} (em {evento['data']})")
+        elif data_evento == dois_dias:
+            alertas.append(f"[2 DIAS] {evento['ativo']} - {evento['descricao']} (em {evento['data']})")
 
-    return alertas_eventos
+    return alertas

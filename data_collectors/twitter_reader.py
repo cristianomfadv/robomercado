@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import json
 import os
 
-# Empresas e termos monitorados
 ativos = [
     "AURE3", "AZUL4", "BRKM5", "CMIN3", "SMAL11",
     "IRBR3", "LREN3", "KLBN11", "XPLG11", "HGBS11", "BBAS3"
@@ -24,8 +23,7 @@ def carregar_historico():
     if os.path.exists(HISTORICO_X):
         with open(HISTORICO_X, "r", encoding="utf-8") as f:
             return json.load(f)
-    else:
-        return []
+    return []
 
 def salvar_historico(lista):
     with open(HISTORICO_X, "w", encoding="utf-8") as f:
@@ -36,8 +34,6 @@ def capturar_tweets():
     headers = {"User-Agent": "Mozilla/5.0"}
     tweets_novos = []
     historico = carregar_historico()
-
-    # Verifica últimos 2 dias
     hoje = datetime.today()
     data_limite = (hoje - timedelta(days=2)).strftime("%Y-%m-%d")
 
@@ -46,7 +42,7 @@ def capturar_tweets():
         url = base_url + query.replace(" ", "+")
 
         try:
-            r = requests.get(url, headers=headers)
+            r = requests.get(url, headers=headers, timeout=10)
             soup = BeautifulSoup(r.text, "html.parser")
             resultados = soup.select("div.g")
 
@@ -55,10 +51,10 @@ def capturar_tweets():
                 if link_tag:
                     link = link_tag["href"]
                     titulo = resultado.text.strip()
-                    id_tweet = link[-30:]  # identificação simples
+                    id_tweet = link[-30:]
 
                     if id_tweet not in historico:
-                        tweets_novos.append(f"{termo.upper()} detectado em tweet:\n{titulo}\n{link}")
+                        tweets_novos.append(f"{termo.upper()} em tweet:\n{titulo}\n{link}")
                         historico.append(id_tweet)
 
         except Exception as e:
@@ -67,4 +63,3 @@ def capturar_tweets():
 
     salvar_historico(historico)
     return tweets_novos
-

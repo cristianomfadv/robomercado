@@ -12,20 +12,31 @@ EVENTOS_RELEVANTES = [
     "delta", "trava", "rolagem", "prêmio", "recompra", "CVM", "fato relevante"
 ]
 
-# Função que retorna se o texto é relevante
-def analisar_texto(texto):
-    texto_lower = texto.lower()
+# Nova função que recebe lista de textos e analisa um a um
+def analisar_texto(lista_de_textos):
+    resultados = []
 
-    # Verifica se algum ativo está no texto
-    ativos_mencionados = [ativo for ativo in ATIVOS_INTERESSE if ativo.lower() in texto_lower]
+    for texto in lista_de_textos:
+        if not isinstance(texto, str):
+            continue  # Ignora se não for string
 
-    # Verifica se algum evento crítico é citado
-    eventos_detectados = [evento for evento in EVENTOS_RELEVANTES if evento in texto_lower]
+        texto_lower = texto.lower()
 
-    # Regras para gerar alerta
-    if ativos_mencionados and eventos_detectados:
-        ativos_str = ", ".join(ativos_mencionados)
-        eventos_str = ", ".join(eventos_detectados)
-        return f"[ALERTA ESTRATÉGICO] Ativo(s): {ativos_str} | Evento(s): {eventos_str} | Texto: {texto}"
+        # Verifica se algum ativo está no texto
+        ativos_mencionados = [ativo for ativo in ATIVOS_INTERESSE if ativo.lower() in texto_lower]
 
-    return None  # Se não cruzar ativo + evento, ignora o texto
+        # Verifica se algum evento crítico é citado
+        eventos_detectados = [evento for evento in EVENTOS_RELEVANTES if evento in texto_lower]
+
+        # Regras para gerar alerta
+        if ativos_mencionados and eventos_detectados:
+            ativos_str = ", ".join(ativos_mencionados)
+            eventos_str = ", ".join(eventos_detectados)
+            resultados.append({
+                "tipo": "alerta",
+                "ativos": ativos_str,
+                "eventos": eventos_str,
+                "mensagem": f"[ALERTA ESTRATÉGICO] {ativos_str} | {eventos_str} | {texto}"
+            })
+
+    return resultados

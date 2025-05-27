@@ -65,8 +65,11 @@ def avaliar_resultados(dias=3):
         else:
             novos_registros.append(registro)
 
-    # Atualiza o arquivo apenas com registros ainda não vencidos
     with open(CAMINHO_REGISTRO, "w", encoding="utf-8") as f:
         json.dump(novos_registros, f, indent=2)
 
     return resultados
+
+# Alias para compatibilidade com o main.py
+def registrar_alerta_historico(alerta):
+    registrar_sinal(alerta["ativo"], alerta["tipo"], alerta["preco_entrada"])

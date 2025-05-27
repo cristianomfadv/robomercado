@@ -5,12 +5,10 @@ from bs4 import BeautifulSoup
 import json
 import os
 
-# Perfis estratégicos a serem monitorados no Nitter (sem @)
 PERFIS = [
     "infomoney", "valoreconomico", "b3_oficial", "suno_research", "br_investnews", "neofeedbr"
 ]
 
-# Termos relevantes para alertas
 TERMS = [
     "PETR4", "VALE3", "BBAS3", "BBDC3", "AZUL4", "LREN3", "IRBR3", "KLBN11",
     "dividendos", "lucro", "prejuízo", "balanço", "projeções", "guidance",
@@ -18,7 +16,6 @@ TERMS = [
     "venda de ativos", "fato relevante", "desdobramento", "reestruturação"
 ]
 
-# Nitter público e caminho do histórico
 NITTER_INSTANCE = "https://nitter.net"
 ARQUIVO_HISTORICO = "tweets_lidos_nitter.json"
 

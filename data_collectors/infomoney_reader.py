@@ -38,7 +38,8 @@ def capturar_noticias_infomoney():
     historico = carregar_historico()
 
     try:
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=10)
+        r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         cards = soup.select("div.card-post")
 
@@ -56,24 +57,17 @@ def capturar_noticias_infomoney():
                 continue
 
             titulo_lower = titulo.lower()
-            relevante = False
-
-            for termo in termos_chave:
-                if termo in titulo_lower:
-                    relevante = True
-                    break
-            for acao in ativos:
-                if acao.lower() in titulo_lower:
-                    relevante = True
-                    break
+            relevante = any(termo in titulo_lower for termo in termos_chave) or \
+                        any(acao.lower() in titulo_lower for acao in ativos)
 
             if relevante:
                 noticias_relevantes.append(f"{titulo}\n{link}")
                 historico.append(id_noticia)
 
-    except Exception as e:
+    except requests.exceptions.Timeout:
+        print("Erro ao capturar InfoMoney: tempo limite excedido (timeout).")
+    except requests.exceptions.RequestException as e:
         print(f"Erro ao capturar InfoMoney: {e}")
 
     salvar_historico(historico)
     return noticias_relevantes
-

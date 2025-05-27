@@ -39,7 +39,7 @@ def calcular_operacao(ativo, preco, tendencia):
         alvo = round(preco * 1.04, 2)
         strike = round(alvo)
         return "trava de alta", strike, alvo, 0.5
-    elif tendencia == "baixa":
+    elif tendência == "baixa":
         alvo = round(preco * 0.96, 2)
         strike = round(alvo)
         return "trava de baixa", strike, alvo, -0.5
@@ -56,7 +56,11 @@ def executar_analise_opcoes():
     for ticker in ATIVOS:
         try:
             dados = yf.download(ticker, period="5d", interval="30m", progress=False)
+
             if dados.empty:
+                mensagem = f"[{ticker.replace('.SA', '')}] Dados ausentes (Yahoo Finance)."
+                print(mensagem)
+                alertas.append(mensagem)
                 continue
 
             ativo = ticker.replace(".SA", "")
@@ -83,7 +87,9 @@ def executar_analise_opcoes():
                 })
 
         except Exception as e:
-            print(f"Erro em {ticker}: {e}")
+            erro_msg = f"[{ticker.replace('.SA', '')}] Erro ao obter dados: {str(e)}"
+            print(erro_msg)
+            alertas.append(erro_msg)
 
     registrar_execucao(registros)
     return alertas
