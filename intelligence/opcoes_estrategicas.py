@@ -1,10 +1,13 @@
-# intelligence/opcoes_estrategicas.py
 
+import os
 import yfinance as yf
+import requests
+import pandas as pd
 from datetime import datetime
 import json
-import os
-import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ATIVOS = [
     "VALE3.SA", "PETR4.SA", "BBAS3.SA", "KLBN11.SA", "CMIN3.SA",
@@ -12,19 +15,23 @@ ATIVOS = [
 ]
 
 ARQUIVO_REGISTRO = "dados/analises_opcoes.json"
+ARQUIVO_LOG_ERROS = "dados/log_falhas_opcoes.txt"
+API_KEY = os.getenv("ALPHAVANTAGE_API_KEY")
 
 def registrar_execucao(dados_execucao):
-    if not os.path.exists("dados"):
-        os.makedirs("dados")
+    os.makedirs("dados", exist_ok=True)
+    historico = []
     if os.path.exists(ARQUIVO_REGISTRO):
         with open(ARQUIVO_REGISTRO, "r", encoding="utf-8") as f:
             historico = json.load(f)
-    else:
-        historico = []
-
     historico.extend(dados_execucao)
     with open(ARQUIVO_REGISTRO, "w", encoding="utf-8") as f:
         json.dump(historico, f, indent=2, ensure_ascii=False)
+
+def registrar_falha(msg):
+    os.makedirs("dados", exist_ok=True)
+    with open(ARQUIVO_LOG_ERROS, "a", encoding="utf-8") as f:
+        f.write(f"{datetime.now()} - {msg}\n")
 
 def analisar_tendencia(dados):
     ultimos = dados[-10:]
@@ -44,7 +51,28 @@ def calcular_operacao(ativo, preco, tendencia):
         alvo = round(preco * 0.96, 2)
         strike = round(alvo)
         return "trava de baixa", strike, alvo, -0.5
-    else:
+    return None
+
+def fallback_alpha_vantage(ticker):
+    try:
+        simbolo = ticker.replace(".SA", "") + ".SA"
+        url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={simbolo}&interval=30min&apikey={API_KEY}&datatype=json"
+        r = requests.get(url)
+        dados = r.json()
+        serie = dados.get("Time Series (30min)", {})
+        if not serie:
+            return None
+        df = pd.DataFrame([
+            {
+                "Datetime": k,
+                "Close": float(v["4. close"])
+            } for k, v in serie.items()
+        ])
+        df = df.sort_values("Datetime")
+        df.set_index("Datetime", inplace=True)
+        return df
+    except Exception as e:
+        registrar_falha(f"Erro Alpha Vantage {ticker}: {e}")
         return None
 
 def executar_analise_opcoes():
@@ -55,12 +83,16 @@ def executar_analise_opcoes():
     data = agora.strftime("%Y-%m-%d")
 
     for ticker in ATIVOS:
-        time.sleep(2)  # evita bloqueio por excesso de requisições
-
         try:
             dados = yf.download(ticker, period="5d", interval="30m", progress=False)
             if dados.empty:
-                raise ValueError("Dados vazios recebidos")
+                registrar_falha(f"{ticker}: Dados ausentes no Yahoo. Tentando fallback Alpha Vantage.")
+                dados = fallback_alpha_vantage(ticker)
+                if dados is None or dados.empty:
+                    msg = f"[{ticker.replace('.SA', '')}] Dados indisponíveis em ambas as fontes."
+                    print(msg)
+                    alertas.append(msg)
+                    continue
 
             ativo = ticker.replace(".SA", "")
             preco = dados["Close"].iloc[-1]
@@ -84,14 +116,9 @@ def executar_analise_opcoes():
                     "strike": strike,
                     "delta": delta
                 })
-
         except Exception as e:
-            ativo = ticker.replace(".SA", "")
-            mensagem = f"[{ativo}] Dados ausentes (Yahoo Finance): {str(e)}"
-            print(mensagem)
-            alertas.append(mensagem)
+            registrar_falha(f"{ticker}: Erro geral - {e}")
 
     if registros:
         registrar_execucao(registros)
-
     return alertas
