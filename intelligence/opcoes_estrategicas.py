@@ -4,6 +4,7 @@ import yfinance as yf
 from datetime import datetime
 import json
 import os
+import time
 
 ATIVOS = [
     "VALE3.SA", "PETR4.SA", "BBAS3.SA", "KLBN11.SA", "CMIN3.SA",
@@ -39,7 +40,7 @@ def calcular_operacao(ativo, preco, tendencia):
         alvo = round(preco * 1.04, 2)
         strike = round(alvo)
         return "trava de alta", strike, alvo, 0.5
-    elif tendência == "baixa":
+    elif tendencia == "baixa":
         alvo = round(preco * 0.96, 2)
         strike = round(alvo)
         return "trava de baixa", strike, alvo, -0.5
@@ -54,14 +55,12 @@ def executar_analise_opcoes():
     data = agora.strftime("%Y-%m-%d")
 
     for ticker in ATIVOS:
+        time.sleep(2)  # evita bloqueio por excesso de requisições
+
         try:
             dados = yf.download(ticker, period="5d", interval="30m", progress=False)
-
             if dados.empty:
-                mensagem = f"[{ticker.replace('.SA', '')}] Dados ausentes (Yahoo Finance)."
-                print(mensagem)
-                alertas.append(mensagem)
-                continue
+                raise ValueError("Dados vazios recebidos")
 
             ativo = ticker.replace(".SA", "")
             preco = dados["Close"].iloc[-1]
@@ -87,9 +86,12 @@ def executar_analise_opcoes():
                 })
 
         except Exception as e:
-            erro_msg = f"[{ticker.replace('.SA', '')}] Erro ao obter dados: {str(e)}"
-            print(erro_msg)
-            alertas.append(erro_msg)
+            ativo = ticker.replace(".SA", "")
+            mensagem = f"[{ativo}] Dados ausentes (Yahoo Finance): {str(e)}"
+            print(mensagem)
+            alertas.append(mensagem)
 
-    registrar_execucao(registros)
+    if registros:
+        registrar_execucao(registros)
+
     return alertas
