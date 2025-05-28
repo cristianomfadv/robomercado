@@ -1,99 +1,127 @@
+import yfinance as yf
 import requests
+import logging
+import datetime
 import os
-import json
-from datetime import datetime
-from bs4 import BeautifulSoup
 
-CACHE_DIR = "data/cache_opcoes"
-LOG_PATH = "logs/logs_erros_analise.txt"
-
-os.makedirs(CACHE_DIR, exist_ok=True)
+LOG_FILE = "logs/opcoes_estrategicas.log"
 os.makedirs("logs", exist_ok=True)
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
+                    format='%(asctime)s %(levelname)s %(message)s')
 
-def log_erro(ativo, erro):
-    with open(LOG_PATH, "a", encoding="utf-8") as f:
-        f.write(f"[{datetime.now()}] {ativo}: {erro}\n")
+# Fallback Alpha Vantage
+from config import ALPHA_VANTAGE_API_KEY
 
-def salvar_cache(ativo, dados):
-    caminho = os.path.join(CACHE_DIR, f"{ativo}.json")
-    with open(caminho, "w", encoding="utf-8") as f:
-        json.dump(dados, f)
+def registrar_erro_opcoes(msg):
+    logging.error(msg)
+    with open(LOG_FILE, "a") as f:
+        f.write(f"{datetime.datetime.now()}: {msg}\n")
 
-def carregar_cache(ativo):
-    caminho = os.path.join(CACHE_DIR, f"{ativo}.json")
-    if os.path.exists(caminho):
-        with open(caminho, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return None
-
-def buscar_preco_brapi(ativo):
+def fetch_yfinance(ticker):
     try:
-        url = f"https://brapi.dev/api/quote/{ativo}?range=5d&interval=1d&fundamental=true"
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            if data and "results" in data and data["results"]:
-                cota = data["results"][0]
-                if "regularMarketPrice" in cota and cota["regularMarketPrice"]:
-                    return float(cota["regularMarketPrice"])
-        raise Exception("Preço não encontrado na resposta da Brapi.")
+        data = yf.Ticker(ticker)
+        hist = data.history(period="5d", interval="1h")
+        if hist.empty:
+            raise ValueError("No data from yfinance")
+        close_prices = hist['Close']
+        tendencia = "alta" if close_prices[-1] > close_prices[0] else "baixa"
+        return {
+            "ticker": ticker,
+            "precos": close_prices.tolist(),
+            "tendencia": tendencia
+        }
     except Exception as e:
-        log_erro(ativo, f"Erro Brapi: {e}")
+        registrar_erro_opcoes(f"YFinance erro para {ticker}: {e}")
         return None
 
-def buscar_preco_fundamentus(ativo):
+def fetch_alpha_vantage(ticker):
     try:
-        url = f"https://www.fundamentus.com.br/detalhes.php?papel={ativo}"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        td_tags = soup.find_all("td")
-        for i, td in enumerate(td_tags):
-            if "Cotação" in td.text:
-                preco_tag = td_tags[i + 1]
-                preco = preco_tag.text.strip().replace(".", "").replace(",", ".")
-                preco_float = float(preco)
-                return preco_float
-        raise Exception("Campo 'Cotação' não localizado.")
+        url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={ticker}.SA&interval=60min&apikey={ALPHA_VANTAGE_API_KEY}'
+        r = requests.get(url, timeout=10)
+        data = r.json()
+        time_series = data.get('Time Series (60min)')
+        if not time_series:
+            raise ValueError("Sem dados do Alpha Vantage")
+        valores = [float(v['4. close']) for v in list(time_series.values())[-5:]]
+        tendencia = "alta" if valores[-1] > valores[0] else "baixa"
+        return {
+            "ticker": ticker,
+            "precos": valores,
+            "tendencia": tendencia
+        }
     except Exception as e:
-        log_erro(ativo, f"Erro Fundamentus: {e}")
+        registrar_erro_opcoes(f"Alpha Vantage erro para {ticker}: {e}")
         return None
 
-def obter_preco_ativo(ativo):
-    preco = buscar_preco_brapi(ativo)
-    if preco is not None:
-        return preco
-    preco = buscar_preco_fundamentus(ativo)
-    if preco is not None:
-        return preco
-    return None
+def fetch_brapi(ticker):
+    try:
+        url = f'https://brapi.dev/api/quote/{ticker}?range=5d&interval=1h'
+        r = requests.get(url, timeout=10)
+        data = r.json()
+        if not data.get("results"):
+            raise ValueError("Sem dados do Brapi")
+        close_prices = data["results"][0]["historicalDataPrice"]
+        precos = [d['close'] for d in close_prices]
+        tendencia = "alta" if precos[-1] > precos[0] else "baixa"
+        return {
+            "ticker": ticker,
+            "precos": precos,
+            "tendencia": tendencia
+        }
+    except Exception as e:
+        registrar_erro_opcoes(f"Brapi erro para {ticker}: {e}")
+        return None
 
-def executar_analise_opcoes():
-    ativos = ["VALE3", "PETR4", "BBAS3", "BOVA11", "BBDC4", "KLBN11", "CMIN3", "IRBR3", "GGBR4", "BRKM5"]
-    resultados = []
-
-    for ativo in ativos:
-        preco_hoje = obter_preco_ativo(ativo)
-        if not preco_hoje:
-            dados = carregar_cache(ativo)
-            if dados:
-                preco_hoje = dados[0]
+def analisar_tendencia(ticker):
+    """
+    Tenta obter os dados do ativo via yfinance, se falhar tenta Alpha Vantage, depois Brapi.
+    Retorna sinal estratégico padronizado para o strategy_engine.
+    """
+    fontes = [
+        lambda t: fetch_yfinance(f"{t}.SA"),
+        lambda t: fetch_yfinance(f"{t}.BVMF"),
+        lambda t: fetch_yfinance(t),
+        fetch_alpha_vantage,
+        fetch_brapi
+    ]
+    for fonte in fontes:
+        dados = fonte(ticker)
+        if dados:
+            tendencia = dados['tendencia']
+            if tendencia == "alta":
+                return {
+                    "ativo": ticker,
+                    "estrategia": "Trava de alta",
+                    "detalhe": f"Tendência de alta detectada nas últimas sessões ({dados['precos'][0]:.2f} -> {dados['precos'][-1]:.2f})"
+                }
+            elif tendencia == "baixa":
+                return {
+                    "ativo": ticker,
+                    "estrategia": "Compra seca de PUT",
+                    "detalhe": f"Tendência de baixa detectada ({dados['precos'][0]:.2f} -> {dados['precos'][-1]:.2f})"
+                }
             else:
-                resultados.append(f"[ERRO] [{ativo}] Sem dados disponíveis em nenhuma fonte e sem cache.")
-                continue
+                return {
+                    "ativo": ticker,
+                    "estrategia": "Sem estratégia",
+                    "detalhe": "Não foi possível identificar tendência clara."
+                }
+    # Se todas as fontes falharem
+    return {
+        "ativo": ticker,
+        "erro": "Falha ao obter dados de cotação em todas as fontes"
+    }
 
-        # Simula série de 5 dias para efeito de tendência
-        serie_simulada = [round(preco_hoje * (1 - 0.01 * i), 2) for i in reversed(range(5))]
-        salvar_cache(ativo, [preco_hoje] + serie_simulada)
-
-        preco_passado = serie_simulada[0]
-
-        if preco_hoje > preco_passado * 1.05:
-            resultados.append(f"[{ativo}] Tendência de ALTA. Sugerido: trava de alta com alvo em R${preco_hoje * 1.1:.2f}")
-        elif preco_hoje < preco_passado * 0.95:
-            resultados.append(f"[{ativo}] Tendência de BAIXA. Sugerido: compra seca de PUT ou trava de baixa.")
-        else:
-            resultados.append(f"[{ativo}] Tendência LATERAL. Sugerido: venda de PUT próxima ao suporte.")
-
-    return resultados
+def gerar_sinais_estrategicos(lista_ativos):
+    """
+    Para cada ativo da lista, executa a análise e retorna uma lista de sinais estratégicos.
+    """
+    sinais = []
+    for ticker in lista_ativos:
+        try:
+            sinal = analisar_tendencia(ticker)
+            sinais.append(sinal)
+        except Exception as e:
+            registrar_erro_opcoes(f"Erro geral para {ticker}: {e}")
+            sinais.append({"ativo": ticker, "erro": str(e)})
+    return sinais
