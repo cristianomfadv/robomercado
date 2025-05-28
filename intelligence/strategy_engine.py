@@ -36,7 +36,7 @@ def extrair_ativo(alerta):
 
 def extrair_preco(alerta):
     import re
-    match = re.search(r"R\\$([0-9]+,[0-9]{2})", alerta)
+    match = re.search(r"R\$(\d+,\d{2})", alerta)
     if match:
         preco_str = match.group(1).replace(",", ".")
         return float(preco_str)
