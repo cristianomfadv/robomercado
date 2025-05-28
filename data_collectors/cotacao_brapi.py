@@ -1,18 +1,31 @@
-# data_collectors/cotacao_brapi.py
-
+import os
 import requests
+import logging
 
-def get_brapi_quote(symbol):
-    """Busca cotação de ativo B3 usando a API Brapi"""
-    url = f"https://brapi.dev/api/quote/{symbol}?range=5d&interval=1d&fundamental=true"
+# Diretório e arquivo de log
+LOG_FILE = "logs/cotacao_brapi.log"
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
+                    format='%(asctime)s %(levelname)s %(message)s')
+
+def buscar_cotacao_brapi(ticker):
+    """Consulta a cotação de um ticker na BRAPI com autenticação opcional."""
+    token = os.getenv("BRAPI_TOKEN")
+    if token:
+        url = f"https://brapi.dev/api/quote/{ticker}?range=5d&interval=1h&token={token}"
+    else:
+        url = f"https://brapi.dev/api/quote/{ticker}?range=5d&interval=1h"
+
     try:
-        r = requests.get(url, timeout=10)
-        if r.status_code == 200:
-            data = r.json()
-            if data and "results" in data and data["results"]:
-                return data["results"][0]
-        return None
+        resposta = requests.get(url, timeout=10)
+        resposta.raise_for_status()
+        dados = resposta.json()
+        if "results" in dados and dados["results"]:
+            preco = dados["results"][0].get("regularMarketPrice")
+            return preco
+        else:
+            logging.error(f"Sem resultados para {ticker}")
+            return None
     except Exception as e:
-        with open('logs/logs_erros_analise.txt', 'a', encoding='utf-8') as log_file:
-            log_file.write(f"Erro Brapi {symbol}: {str(e)}\n")
+        logging.error(f"Erro ao buscar cotação de {ticker}: {e}")
         return None
