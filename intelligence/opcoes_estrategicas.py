@@ -1,9 +1,8 @@
-
 import requests
 import os
 import json
-from bs4 import BeautifulSoup
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 CACHE_DIR = "data/cache_opcoes"
 LOG_PATH = "logs/logs_erros_analise.txt"
@@ -27,6 +26,21 @@ def carregar_cache(ativo):
             return json.load(f)
     return None
 
+def buscar_preco_brapi(ativo):
+    try:
+        url = f"https://brapi.dev/api/quote/{ativo}?range=5d&interval=1d&fundamental=true"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data and "results" in data and data["results"]:
+                cota = data["results"][0]
+                if "regularMarketPrice" in cota and cota["regularMarketPrice"]:
+                    return float(cota["regularMarketPrice"])
+        raise Exception("Preço não encontrado na resposta da Brapi.")
+    except Exception as e:
+        log_erro(ativo, f"Erro Brapi: {e}")
+        return None
+
 def buscar_preco_fundamentus(ativo):
     try:
         url = f"https://www.fundamentus.com.br/detalhes.php?papel={ativo}"
@@ -46,18 +60,27 @@ def buscar_preco_fundamentus(ativo):
         log_erro(ativo, f"Erro Fundamentus: {e}")
         return None
 
+def obter_preco_ativo(ativo):
+    preco = buscar_preco_brapi(ativo)
+    if preco is not None:
+        return preco
+    preco = buscar_preco_fundamentus(ativo)
+    if preco is not None:
+        return preco
+    return None
+
 def executar_analise_opcoes():
     ativos = ["VALE3", "PETR4", "BBAS3", "BOVA11", "BBDC4", "KLBN11", "CMIN3", "IRBR3", "GGBR4", "BRKM5"]
     resultados = []
 
     for ativo in ativos:
-        preco_hoje = buscar_preco_fundamentus(ativo)
+        preco_hoje = obter_preco_ativo(ativo)
         if not preco_hoje:
             dados = carregar_cache(ativo)
             if dados:
                 preco_hoje = dados[0]
             else:
-                resultados.append(f"[ERRO] [{ativo}] Sem dados disponíveis no Fundamentus e sem cache.")
+                resultados.append(f"[ERRO] [{ativo}] Sem dados disponíveis em nenhuma fonte e sem cache.")
                 continue
 
         # Simula série de 5 dias para efeito de tendência
