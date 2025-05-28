@@ -1,0 +1,21 @@
+[2025-05-27 20:41:14.226442] VALE3: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:14.718989] PETR4: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:15.287248] BBAS3: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:15.862068] BOVA11: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:16.577685] BBDC4: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:16.806696] KLBN11: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:17.375186] CMIN3: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:17.872711] IRBR3: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:18.337750] GGBR4: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:41:18.933743] BRKM5: Erro Alpha Vantage: Sem dados Alpha Vantage
+[2025-05-27 20:58:43.088892] VALE3: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:44.404976] PETR4: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:45.379054] BBAS3: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:48.365202] BOVA11: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:49.877371] BBDC4: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:51.350639] KLBN11: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:52.833324] CMIN3: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:53.932785] IRBR3: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:55.624686] GGBR4: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 20:58:57.034654] BRKM5: Erro ao buscar no StatusInvest: Preço não encontrado na página.
+[2025-05-27 21:03:30.013693] BOVA11: Erro Fundamentus: Campo 'Cotação' não localizado.

@@ -1,0 +1,10 @@
+[2025-05-27 20:28:16.775492] VALE3: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:20.385652] PETR4: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:24.200807] BBAS3: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:27.927767] BOVA11: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:31.513630] BBDC4: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:35.771448] KLBN11: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:40.134223] CMIN3: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:44.834972] IRBR3: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:49.441424] GGBR4: Alpha Vantage API KEY não configurada.
+[2025-05-27 20:28:53.818654] BRKM5: Alpha Vantage API KEY não configurada.

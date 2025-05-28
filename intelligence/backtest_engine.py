@@ -2,74 +2,42 @@
 
 import json
 import os
-from datetime import datetime, timedelta
-import yfinance as yf
+from datetime import datetime
 
-CAMINHO_REGISTRO = "historico/backtest_registro.json"
+CAMINHO_BACKTEST = "historico/backtest_registro.json"
+os.makedirs("historico", exist_ok=True)
 
-def registrar_sinal(ativo, tipo_recomendacao, preco_entrada):
-    entrada = {
-        "ativo": ativo,
-        "tipo": tipo_recomendacao,
-        "data": datetime.now().strftime("%Y-%m-%d"),
-        "preco_entrada": preco_entrada
-    }
-
-    if not os.path.exists("historico"):
-        os.makedirs("historico")
-
+def registrar_sinal(ativo, tipo, preco_entrada):
     try:
-        with open(CAMINHO_REGISTRO, "r", encoding="utf-8") as f:
-            registros = json.load(f)
+        with open(CAMINHO_BACKTEST, "r", encoding="utf-8") as f:
+            dados = json.load(f)
     except:
-        registros = []
+        dados = []
 
-    registros.append(entrada)
+    dados.append({
+        "data": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "ativo": ativo,
+        "tipo": tipo,
+        "preco_entrada": preco_entrada
+    })
 
-    with open(CAMINHO_REGISTRO, "w", encoding="utf-8") as f:
-        json.dump(registros, f, indent=2)
+    with open(CAMINHO_BACKTEST, "w", encoding="utf-8") as f:
+        json.dump(dados, f, indent=2, ensure_ascii=False)
 
-def avaliar_resultados(dias=3):
-    if not os.path.exists(CAMINHO_REGISTRO):
+def registrar_alerta_historico(alerta):
+    try:
+        preco = alerta.get("preco_entrada", "n/d")
+        registrar_sinal(alerta["ativo"], alerta["tipo"], preco)
+    except Exception as e:
+        print(f"Erro ao registrar backtest: {e}")
+
+def avaliar_resultados():
+    try:
+        with open(CAMINHO_BACKTEST, "r", encoding="utf-8") as f:
+            dados = json.load(f)
+    except:
         return []
 
-    with open(CAMINHO_REGISTRO, "r", encoding="utf-8") as f:
-        registros = json.load(f)
-
-    resultados = []
     hoje = datetime.now().date()
-    novos_registros = []
-
-    for registro in registros:
-        data_sinal = datetime.strptime(registro["data"], "%Y-%m-%d").date()
-        if (hoje - data_sinal).days >= dias:
-            ativo = registro["ativo"]
-            preco_inicial = registro["preco_entrada"]
-
-            try:
-                dados = yf.download(ativo + ".SA", start=str(data_sinal + timedelta(days=dias)), end=str(data_sinal + timedelta(days=dias+1)), progress=False)
-                preco_final = dados["Close"].iloc[0]
-                variacao = preco_final - preco_inicial
-
-                if "CALL" in registro["tipo"] or "alta" in registro["tipo"]:
-                    resultado = "✅ Acerto" if variacao > 0 else "❌ Erro"
-                elif "PUT" in registro["tipo"] or "baixa" in registro["tipo"]:
-                    resultado = "✅ Acerto" if variacao < 0 else "❌ Erro"
-                else:
-                    resultado = "⚠ Neutro"
-
-                resultados.append(f"{ativo} | {registro['tipo']} | {registro['data']} → {resultado} ({variacao:.2f})")
-            except:
-                resultados.append(f"{ativo} | {registro['tipo']} | {registro['data']} → Dados indisponíveis")
-
-        else:
-            novos_registros.append(registro)
-
-    with open(CAMINHO_REGISTRO, "w", encoding="utf-8") as f:
-        json.dump(novos_registros, f, indent=2)
-
-    return resultados
-
-# Alias para compatibilidade com o main.py
-def registrar_alerta_historico(alerta):
-    registrar_sinal(alerta["ativo"], alerta["tipo"], alerta["preco_entrada"])
+    ultimos = [d for d in dados if datetime.strptime(d["data"], "%Y-%m-%d %H:%M:%S").date() >= hoje]
+    return [f"{d['data']} — {d['ativo']} — {d['tipo']} — entrada: R$ {d['preco_entrada']}" for d in ultimos]

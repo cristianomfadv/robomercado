@@ -1,0 +1,302 @@
+[
+  {
+    "ativo": "IRBR3",
+    "tipo": "[IRBR3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "VALE3",
+    "tipo": "[VALE3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BBAS3",
+    "tipo": "[BBAS3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BBDC4",
+    "tipo": "[BBDC4] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BOVA11",
+    "tipo": "[BOVA11] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "GGBR4",
+    "tipo": "[GGBR4] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "PETR4",
+    "tipo": "[PETR4] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BRKM5",
+    "tipo": "[BRKM5] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "CMIN3",
+    "tipo": "[CMIN3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "KLBN11",
+    "tipo": "[KLBN11] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "IRBR3",
+    "tipo": "[IRBR3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "PETR4",
+    "tipo": "[PETR4] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BBAS3",
+    "tipo": "[BBAS3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BRKM5",
+    "tipo": "[BRKM5] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BBDC4",
+    "tipo": "[BBDC4] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "GGBR4",
+    "tipo": "[GGBR4] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "BOVA11",
+    "tipo": "[BOVA11] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "KLBN11",
+    "tipo": "[KLBN11] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "CMIN3",
+    "tipo": "[CMIN3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "ativo": "VALE3",
+    "tipo": "[VALE3] Dados ausentes (Yahoo Finance).",
+    "data": "2025-05-26",
+    "preco_entrada": 0.0
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "VALE3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "PETR4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "BBAS3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "BOVA11",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "BBDC4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "KLBN11",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "CMIN3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "IRBR3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "GGBR4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:48:35",
+    "ativo": "BRKM5",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "VALE3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "PETR4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "BBAS3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "BOVA11",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "BBDC4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "KLBN11",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "CMIN3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "IRBR3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "GGBR4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 20:58:57",
+    "ativo": "BRKM5",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "VALE3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "PETR4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "BBAS3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "BOVA11",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "BBDC4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "KLBN11",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "CMIN3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "IRBR3",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "GGBR4",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  },
+  {
+    "data": "2025-05-27 21:03:33",
+    "ativo": "BRKM5",
+    "tipo": "opcao",
+    "preco_entrada": "n/d"
+  }
+]
