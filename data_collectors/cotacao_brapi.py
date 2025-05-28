@@ -1,31 +1,33 @@
-import os
+# cotacao_brapi.py
 import requests
-import logging
+import os
 
-# Diretório e arquivo de log
-LOG_FILE = "logs/cotacao_brapi.log"
-os.makedirs("logs", exist_ok=True)
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s')
-
-def buscar_cotacao_brapi(ticker):
-    """Consulta a cotação de um ticker na BRAPI com autenticação opcional."""
+def obter_dados_acao_brapi(ticker):
     token = os.getenv("BRAPI_TOKEN")
-    if token:
-        url = f"https://brapi.dev/api/quote/{ticker}?range=5d&interval=1h&token={token}"
-    else:
-        url = f"https://brapi.dev/api/quote/{ticker}?range=5d&interval=1h"
+    url = f"https://brapi.dev/api/quote/{ticker}?range=5d&interval=1d&token={token}"
 
     try:
-        resposta = requests.get(url, timeout=10)
-        resposta.raise_for_status()
-        dados = resposta.json()
-        if "results" in dados and dados["results"]:
-            preco = dados["results"][0].get("regularMarketPrice")
-            return preco
+        print(f"🔍 [BRAPI] Chamando: {url}")
+        response = requests.get(url, timeout=10)
+        print(f"📥 [BRAPI] Status: {response.status_code}")
+        print(f"📄 [BRAPI] Texto bruto: {response.text[:300]}")
+
+        response.raise_for_status()
+        data = response.json()
+
+        if "results" in data and len(data["results"]) > 0:
+            return data["results"][0]
         else:
-            logging.error(f"Sem resultados para {ticker}")
+            print(f"⚠️ [BRAPI] Nenhum dado em 'results' para {ticker}")
             return None
+
+    except requests.exceptions.Timeout:
+        print("❌ Timeout ao acessar a BRAPI")
+    except requests.exceptions.ConnectionError as e:
+        print(f"❌ Erro de conexão com a BRAPI: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Erro geral de requisição: {e}")
     except Exception as e:
-        logging.error(f"Erro ao buscar cotação de {ticker}: {e}")
-        return None
+        print(f"❌ Erro inesperado: {type(e).__name__}: {e}")
+
+    return None
