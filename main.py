@@ -97,11 +97,9 @@ def fluxo_principal():
         print("Erro na análise gráfica:\n", traceback.format_exc())
 
     try:
-        alertas_finais = estrategia_final(
-            extrair_ativos_clipping(analises_clipping_raw),
-            extrair_ativos_graficos(analises_graficas_raw),
-            extrair_ativos_eventos(eventos_previstos_raw)
-        )
+        # Chama apenas com a lista de análises gráficas para evitar erro de argumentos
+        alertas_finais = estrategia_final(analises_graficas_raw)
+        # Se desejar fundir outros sinais futuramente, basta combinar as listas
     except Exception:
         alertas_finais = []
         print("Erro ao gerar recomendação final:\n", traceback.format_exc())
